@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const conn = require('./db_config')
+const conn = require("./db_config");
 
 const app = express();
 
@@ -8,8 +8,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-  res.send("BLOG API")
-})
+  res.send("BLOG API");
+});
 
 // GET all users
 app.get("/users", (req, res) => {
@@ -89,6 +89,14 @@ app.post("/comment", (req, res) => {
       res.json(comment);
     }
   );
+});
+
+app.get("/nodbusers", (req, res) => {
+  const users = [
+    { id: 1, name: "pao", age: 20 },
+    { id: 2, name: "pao2", age: 25 },
+  ];
+  res.json(users)
 });
 
 app.listen(3000, () => {
