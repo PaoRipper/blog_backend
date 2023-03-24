@@ -91,6 +91,6 @@ app.post("/comment", (req, res) => {
   );
 });
 
-app.listen(process.env.DB_PORT, () => {
+app.listen(3000, () => {
   console.log(`Listening on port ${process.env.DB_PORT}`);
 });
