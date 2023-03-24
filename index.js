@@ -7,6 +7,10 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  res.send("BLOG API")
+})
+
 // GET all users
 app.get("/users", (req, res) => {
   conn.query("SELECT * FROM users", (err, results) => {
