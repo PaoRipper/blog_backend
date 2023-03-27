@@ -1,11 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors")
 const conn = require("./db_config");
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors())
 
 app.get("/", (req, res) => {
   res.send("BLOG API");
@@ -33,7 +35,7 @@ app.post("/user", (req, res) => {
     }
     // Insert new user
     conn.query(
-      "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?)",
+      "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
       [username, password, email],
       (err, results) => {
         if (err) throw err;
@@ -46,7 +48,7 @@ app.post("/user", (req, res) => {
 
 // GET ALL posts
 app.get("/posts", (req, res) => {
-  conn.query("SELECT * FROM posts", (err, results) => {
+  conn.query("SELECT posts.*, comments.commentText FROM posts LEFT JOIN comments ON posts.postID = comments.postID", (err, results) => {
     if (err) throw err;
     res.json(results);
   });
@@ -54,16 +56,15 @@ app.get("/posts", (req, res) => {
 
 // POST a new post
 app.post("/post", (req, res) => {
-  const { content, userID } = req.body;
+  const { title, content, userID } = req.body;
 
   conn.query(
-    "INSERT INTO posts (Content, UserID) VALUES (?, ?)",
-    [content, userID],
+    "INSERT INTO posts (postTitle, postText, userID) VALUES (?, ?, ?)",
+    [title, content, userID],
     (err, results) => {
       if (err) throw err;
-      const post = { message: "success", data: { content, userID } };
+      const post = { message: "success", data: { title, content, userID } };
       res.json(post);
-      // res.status(200).send({ message: "Insert successfully" });
     }
   );
 });
@@ -81,7 +82,7 @@ app.post("/comment", (req, res) => {
   const { content, userID, postID } = req.body;
 
   conn.query(
-    "INSERT INTO comments (Content, UserID, PostID) VALUES (?, ?, ?)",
+    "INSERT INTO comments (commentText, userID, postID) VALUES (?, ?, ?)",
     [content, userID, postID],
     (err, results) => {
       if (err) throw err;
@@ -99,6 +100,6 @@ app.get("/nodbusers", (req, res) => {
   res.json(users)
 });
 
-app.listen(3000, () => {
-  console.log(`Listening on port ${process.env.DB_PORT}`);
+app.listen(8000, () => {
+  console.log(`Listening on port 8000`);
 });
