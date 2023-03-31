@@ -30,6 +30,9 @@ app.use(
     secret: "bonn",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: false,
+    }
   })
 );
 
@@ -37,7 +40,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
-  console.log("user serialize = ", user);
   done(null, user.id);
 });
 
