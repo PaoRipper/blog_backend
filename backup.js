@@ -4,30 +4,22 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const conn = require("./db_config");
-const session = require("express-session");
 const passport = require("passport");
-const cookieParser = require("cookie-parser");
+const session = require("express-session");
 
-const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const app = express();
 
 app.set("view engine", "ejs");
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true,
-};
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(
   session({
-    secret: "bonn",
+    secret: "Bonn",
     resave: false,
     saveUninitialized: false,
   })
@@ -37,18 +29,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
-  console.log("user serialize = ", user);
-  done(null, user.id);
+  console.log('googleid = ', user.googleid);
+  done(null, user.googleid);
 });
 
 passport.deserializeUser((id, done) => {
-  conn.query("SELECT * FROM users WHERE googleid = ?", [id], (err, rows) => {
-    if (err) return done(err);
-    if (!rows || rows.length === 0) {
-      return done(null, false);
+  console.log('deserialize');
+  conn.query(
+    "SELECT * FROM users WHERE googleid = ?",
+    [id],
+    (err, rows) => {
+      if (err) return done(err);
+      done(null, rows[0]);
     }
-    return done(null, rows[0]);
-  });
+  );
 });
 
 passport.use(
@@ -59,37 +53,29 @@ passport.use(
       callbackURL: "http://localhost:8000/auth/google/bonn",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
-    function (accessToken, refreshToken, profile, done) {
-      const users = {
-        id: profile.id,
-        username: profile.displayName,
-        accessToken,
-      };
-      conn.query(
-        "SELECT * FROM users WHERE googleid = ?",
-        [profile.id],
-        (err, rows) => {
-          if (err) throw err;
-          if (rows.length <= 0) {
-            conn.query(
-              "INSERT INTO users (username, email, googleid) VALUES (?, ?, ?)",
-              [profile.displayName, profile.emails[0].value, profile.id],
-              (error, results) => {
-                if (results) {
-                  done(null, users);
-                }
-              }
-            );
+    function (accessToken, refreshToken, profile, cb) {
+      if (profile) {
+        conn.query(
+          "INSERT INTO users (username, email, googleid) VALUES (?, ?, ?)",
+          [profile.displayName, profile.emails[0].value, profile.id],
+          (err, result) => {
+            if (err) return cb(err);
+            const user = {
+              id: result.insertId,
+              googleid: profile.id,
+              email: profile.emails[0].value,
+              username: profile.displayName,
+            };
+            return cb(null, user);
           }
-          done(null, users);
-        }
-      );
+        );
+      }
     }
   )
 );
 
 app.get("/", (req, res) => {
-  res.send("INDEX");
+  res.send("/");
 });
 
 app.get(
@@ -100,18 +86,25 @@ app.get(
 app.get(
   "/auth/google/bonn",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/signup",
     successRedirect: "http://localhost:3000",
+    failureRedirect: "http://localhost:3000/signup",
   })
+  // (req, res) => {
+  //   // Successful authentication, redirect home.
+  // }
 );
 
-app.get("/auth/google/success", (req, res) => {
-  if (req.isAuthenticated()) {
-    const sessionId = req.cookies["connect.sid"];
-    const data = { user: req.user, connect_sid: sessionId, auth: true };
-    res.status(200).send({ message: "success", data });
+app.get("/googlelogin/success", (req, res) => {
+  console.log("req.user = ", req.user);
+  if (req.user) {
+    console.log(req.user);
+    res.status(200).json({
+      success: true,
+      user: req.user,
+      cookies: req.cookies
+    })
   }
-});
+})
 
 // GET all users
 app.get("/users", (req, res) => {
@@ -204,45 +197,38 @@ app.get("/nodbusers", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const { email, password, type } = req.body;
+  const { email, password } = req.body;
   // Check if user exists and password is correct
   conn.query(
-    "SELECT * FROM users WHERE email = ? AND type = ?",
-    [email, type],
+    "SELECT * FROM users WHERE users.email = ?",
+    [email],
     (err, results) => {
       if (err) throw err;
-      if (results.length > 0) {
-        bcrypt.compare(password, results[0].password, (error, result) => {
-          if (error) throw error;
-          if (result) {
-            const username = results[0].username;
-            const token = jwt.sign(
-              { auth: true, username, email, password },
-              process.env.SECRET_KEY,
-              {
-                expiresIn: "6h",
-              }
-            );
-            return res.status(200).send({ auth: true, token, username });
-          }
+      bcrypt.compare(password, results[0].password, (error, result) => {
+        if (error) throw error;
+        if (result) {
+          const token = jwt.sign(
+            { auth: true, username: results[0].username, email, password },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: "1h",
+            }
+          );
           return res
-            .status(401)
-            .send({ message: "Invalid email or password." });
-        });
-      } else {
-        return res
-          .status(503)
-          .send({ auth: false, message: "Record not found" });
-      }
+            .status(200)
+            .send({ auth: true, token, username: results[0].username });
+        }
+        return res.status(401).send({ message: "Invalid email or password." });
+      });
     }
   );
 });
 
 app.post("/register", (req, res) => {
-  const { username, password, email, type } = req.body;
+  const { username, password, email } = req.body;
   // Check if user is already taken
   conn.query(
-    "SELECT * FROM users WHERE email = ? AND googleid IS NULL",
+    "SELECT * FROM users WHERE users.email = ?",
     [email],
     async (err, result) => {
       if (err) throw err;
@@ -253,8 +239,8 @@ app.post("/register", (req, res) => {
       // Add new user to database
       const encryptedPassword = await bcrypt.hash(password, 10);
       conn.query(
-        "INSERT INTO users (username, password, email, type) VALUES (?, ?, ?, ?)",
-        [username, encryptedPassword, email, type],
+        "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+        [username, encryptedPassword, email],
         (err, result) => {
           if (err) throw err;
           const token = jwt.sign(

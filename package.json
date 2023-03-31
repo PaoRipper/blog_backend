@@ -13,10 +13,19 @@
   "author": "Paori",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0"
   }
 }
