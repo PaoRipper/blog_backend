@@ -32,7 +32,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: false,
-    }
+    },
   })
 );
 
@@ -155,6 +155,25 @@ app.get("/posts", (req, res) => {
     (err, results) => {
       if (err) throw err;
       res.json(results);
+    }
+  );
+});
+
+app.get("/post/:id", (req, res) => {
+  const { id } = req.params;
+  conn.query("SELECT posts.*,comments.commentText as comment, comments.userID as commentUser FROM posts, comments WHERE posts.postID = ? AND comments.postID = posts.postID", [id], (err, rows) => {
+  // conn.query(
+  //   "SELECT posts.postID AS postId, posts.postTitle, posts.postText, comments.userID AS userId, comments.commentText AS text \
+  //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID WHERE posts.postID = ? \
+  //   GROUP BY posts.postID, comments.userID, comments.commentText",
+  //   [id],
+  //   (err, rows) => {
+      if (err) throw err;
+      if (rows.length > 0) {
+        res.json(rows);
+      } else {
+        res.status(404).send({ message: "No record found" });
+      }
     }
   );
 });
