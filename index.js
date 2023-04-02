@@ -151,7 +151,9 @@ app.post("/user", (req, res) => {
 // GET ALL posts
 app.get("/posts", (req, res) => {
   conn.query(
-    "SELECT posts.*, comments.commentText FROM posts LEFT JOIN comments ON posts.postID = comments.postID",
+    "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
+    FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
+    GROUP BY posts.postID",
     (err, results) => {
       if (err) throw err;
       res.json(results);
@@ -161,15 +163,17 @@ app.get("/posts", (req, res) => {
 
 app.get("/post/:id", (req, res) => {
   const { id } = req.params;
-  conn.query("SELECT posts.*,comments.commentText as comment, comments.userID as commentUser FROM posts, comments WHERE posts.postID = ? AND comments.postID = posts.postID", [id], (err, rows) => {
-  // conn.query(
-  //   "SELECT posts.postID AS postId, posts.postTitle, posts.postText, comments.userID AS userId, comments.commentText AS text \
-  //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID WHERE posts.postID = ? \
-  //   GROUP BY posts.postID, comments.userID, comments.commentText",
-  //   [id],
-  //   (err, rows) => {
+  conn.query(
+    "SELECT posts.*, users.username, comments.commentText as comment, comments.userID as commentUser \
+  FROM posts JOIN comments ON posts.postID = ? \
+  AND comments.postID = posts.postID \
+  JOIN users ON users.userID = posts.userID",
+    [id],
+    (err, rows) => {
+      // conn.query("SELECT posts.*, comments.commentText as comment, comments.userID as commentUser FROM posts, comments WHERE posts.postID = ? AND comments.postID = posts.postID", [id], (err, rows) => {
       if (err) throw err;
       if (rows.length > 0) {
+        console.log(rows);
         res.json(rows);
       } else {
         res.status(404).send({ message: "No record found" });
@@ -180,14 +184,13 @@ app.get("/post/:id", (req, res) => {
 
 // POST a new post
 app.post("/post", (req, res) => {
-  const { title, content, userID } = req.body;
-
+  const { body, userID } = req.body;
   conn.query(
-    "INSERT INTO posts (postTitle, postText, userID) VALUES (?, ?, ?)",
-    [title, content, userID],
+    "INSERT INTO posts (postText, userID) VALUES (?, ?)",
+    [body, userID],
     (err, results) => {
       if (err) throw err;
-      const post = { message: "success", data: { title, content, userID } };
+      const post = { message: "success", data: { userID, body } };
       res.json(post);
     }
   );
