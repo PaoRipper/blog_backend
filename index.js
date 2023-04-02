@@ -239,7 +239,7 @@ app.post("/login", (req, res) => {
         bcrypt.compare(password, results[0].password, (error, result) => {
           if (error) throw error;
           if (result) {
-            const username = results[0].username;
+            const {userID, username} = results[0]
             const token = jwt.sign(
               { auth: true, username, email, password },
               process.env.SECRET_KEY,
@@ -247,7 +247,7 @@ app.post("/login", (req, res) => {
                 expiresIn: "6h",
               }
             );
-            return res.status(200).send({ auth: true, token, username });
+            return res.status(200).send({ auth: true, token, userID, username });
           }
           return res
             .status(401)
