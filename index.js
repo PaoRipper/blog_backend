@@ -58,7 +58,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://fluffy-lamb-skirt.cyclic.app/auth/google/bonn",
+      callbackURL: "http://localhost:8000/auth/google/bonn",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     function (accessToken, refreshToken, profile, done) {
