@@ -1,12 +1,15 @@
 require("dotenv").config();
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
-const conn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "123456789",
-  database: "blog_db",
-});
+// const conn = mysql.createConnection({
+//   host: "aws.connect.psdb.cloud",
+//   user: "xa80auhipyzevo6ch2bs",
+//   password: "pscale_pw_F4ANAVDVs83Az1QSySbaGhc8xeCKnlJ5tlVjiehb2TE",
+//   database: "bonn_db",
+//   ssl: { "rejectUnauthorized": true }
+// });
+
+const conn = mysql.createConnection(process.env.DATABASE_URL)
 
 conn.connect((err) => {
   if (err) {

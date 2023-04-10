@@ -152,8 +152,11 @@ app.post("/user", (req, res) => {
 app.get("/posts", (req, res) => {
   conn.query(
     "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
-    FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
-    GROUP BY posts.postID",
+    FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID",
+  // conn.query(
+  //   "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
+  //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
+  //   GROUP BY posts.postID",
     (err, results) => {
       if (err) throw err;
       res.json(results);
