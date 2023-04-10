@@ -167,10 +167,14 @@ app.get("/posts", (req, res) => {
 app.get("/post/:id", (req, res) => {
   const { id } = req.params;
   conn.query(
-    "SELECT posts.*, users.username, comments.commentText as comment, comments.userID as commentUser \
-  FROM posts JOIN comments ON posts.postID = ? \
-  AND comments.postID = posts.postID \
-  JOIN users ON users.userID = posts.userID",
+    "SELECT posts.postID, posts.postText as body, posts.userID, users.username, comments.commentText as comment, comments.userID as commentUser \
+    FROM posts LEFT JOIN users ON posts.userID = users.userID \
+    LEFT JOIN comments ON posts.postID = comments.postID \
+    WHERE posts.postID = ?",
+    // "SELECT posts.*, users.username, comments.commentText as comment, comments.userID as commentUser \
+    //   FROM posts JOIN comments ON posts.postID = ? \
+    //   AND comments.postID = posts.postID \
+    //   JOIN users ON users.userID = posts.userID",
     [id],
     (err, rows) => {
       // conn.query("SELECT posts.*, comments.commentText as comment, comments.userID as commentUser FROM posts, comments WHERE posts.postID = ? AND comments.postID = posts.postID", [id], (err, rows) => {
