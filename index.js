@@ -27,13 +27,12 @@ app.use(cors(corsOptions));
 
 app.use(
   session({
+    name: "bonn",
     secret: "bonn",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: "auto",
-      sameSite: "none",
-      httpOnly: false,
+      secure: true,
     },
   })
 );
