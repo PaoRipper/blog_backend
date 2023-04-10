@@ -249,7 +249,7 @@ app.post("/login", (req, res) => {
           if (result) {
             const { userID, username } = results[0]
             const token = jwt.sign(
-              { auth: true, username, email, password },
+              { auth: true, userID, username, email, password },
               process.env.SECRET_KEY,
               {
                 expiresIn: "6h",
