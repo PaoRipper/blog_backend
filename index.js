@@ -8,7 +8,6 @@ const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 
-const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const app = express();
@@ -27,11 +26,11 @@ app.use(cors(corsOptions));
 
 app.use(
   session({
-    name: "bonn",
     secret: "bonn",
     resave: false,
     saveUninitialized: false,
     cookie: {
+      sameSite: "none",
       secure: true,
     },
   })
@@ -154,10 +153,10 @@ app.get("/posts", (req, res) => {
   conn.query(
     "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
     FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID",
-  // conn.query(
-  //   "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
-  //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
-  //   GROUP BY posts.postID",
+    // conn.query(
+    //   "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
+    //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
+    //   GROUP BY posts.postID",
     (err, results) => {
       if (err) throw err;
       res.json(results);
@@ -247,7 +246,7 @@ app.post("/login", (req, res) => {
         bcrypt.compare(password, results[0].password, (error, result) => {
           if (error) throw error;
           if (result) {
-            const {userID, username} = results[0]
+            const { userID, username } = results[0]
             const token = jwt.sign(
               { auth: true, username, email, password },
               process.env.SECRET_KEY,
