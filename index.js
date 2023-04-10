@@ -30,9 +30,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none",
       secure: true,
-      maxAge: 120 * 60 * 1000
+      httpOnly: true,
+      domain: process.env.DOMAIN
     },
   })
 );
