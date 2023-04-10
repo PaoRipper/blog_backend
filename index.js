@@ -30,9 +30,11 @@ app.use(
     secret: "bonn",
     resave: false,
     saveUninitialized: false,
-    // cookie: {
-    //   httpOnly: false,
-    // },
+    cookie: {
+      secure: "auto",
+      sameSite: "none",
+      httpOnly: false,
+    },
   })
 );
 
