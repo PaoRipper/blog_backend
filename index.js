@@ -102,8 +102,8 @@ app.get(
 app.get(
   "/auth/google/bonn",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/signup",
-    successRedirect: "http://localhost:3000",
+    failureRedirect: "https://blog-frontend-jade-nine.vercel.app//signup",
+    successRedirect: "https://blog-frontend-jade-nine.vercel.app/",
   })
 );
 
