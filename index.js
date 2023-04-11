@@ -252,7 +252,7 @@ app.post("/login", (req, res) => {
               { auth: true, userID, username, email, password },
               process.env.SECRET_KEY,
               {
-                expiresIn: "6h",
+                expiresIn: "5m",
               }
             );
             return res.status(200).send({ auth: true, token, userID, username });
