@@ -248,12 +248,10 @@ app.post("/login", (req, res) => {
           if (error) throw error;
           if (result) {
             const { userID, username } = results[0]
-            const payload = { auth: true, userID, username, email, password }
-            const expireIn = { expireIn: "3h" }
             const token = jwt.sign(
-              payload,
+              { auth: true, userID, username, email, password },
               process.env.SECRET_KEY,
-              expireIn
+              { expiresIn: "3h" }
             );
             return res.status(200).send({ auth: true, token, userID, username });
           }
