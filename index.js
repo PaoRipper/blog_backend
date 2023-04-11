@@ -154,10 +154,6 @@ app.get("/posts", (req, res) => {
   conn.query(
     "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
     FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID",
-    // conn.query(
-    //   "SELECT posts.postID, posts.postText, posts.created_at, users.username, comments.commentText \
-    //   FROM posts LEFT JOIN comments ON posts.postID = comments.postID LEFT JOIN users ON users.userID = posts.userID \
-    //   GROUP BY posts.postID",
     (err, results) => {
       if (err) throw err;
       res.json(results);
@@ -172,13 +168,8 @@ app.get("/post/:id", (req, res) => {
     FROM posts LEFT JOIN users ON posts.userID = users.userID \
     LEFT JOIN comments ON posts.postID = comments.postID \
     WHERE posts.postID = ?",
-    // "SELECT posts.*, users.username, comments.commentText as comment, comments.userID as commentUser \
-    //   FROM posts JOIN comments ON posts.postID = ? \
-    //   AND comments.postID = posts.postID \
-    //   JOIN users ON users.userID = posts.userID",
     [id],
     (err, rows) => {
-      // conn.query("SELECT posts.*, comments.commentText as comment, comments.userID as commentUser FROM posts, comments WHERE posts.postID = ? AND comments.postID = posts.postID", [id], (err, rows) => {
       if (err) throw err;
       if (rows.length > 0) {
         console.log(rows);
