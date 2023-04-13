@@ -126,9 +126,20 @@ app.get("/users", (req, res) => {
 
 app.get("/users/:userId/posts", (req, res) => {
   const { userId } = req.params;
-  conn.query("SELECT p.*, c.comments_count \
+  const { filter } = req.body;
+  let filtered = "DESC"
+  switch (filter) {
+    case "Most comments":
+      filtered = "DESC"
+      break;
+    case "Less comments":
+      filtered = "ASC"
+    default:
+      break;
+  }
+  conn.query(`SELECT p.*, c.comments_count \
   FROM posts p LEFT JOIN (SELECT postID, count(*) AS comments_count FROM comments GROUP BY postID) c \
-  ON p.postID = c.postID WHERE p.userID = ?", userId, (err, rows) => {
+  ON p.postID = c.postID WHERE p.userID = ? ORDER BY c.comments_count ${filtered}`, userId, (err, rows) => {
     if (err) throw err;
     res.json(rows);
   })
