@@ -124,11 +124,12 @@ app.get("/users", (req, res) => {
   });
 });
 
+// GET POST BY USERID
 app.get("/users/:userId/posts", (req, res) => {
   const userId = req.params.userId
   const sortBy = req.query.sortBy
   let filtered = "DESC"
-  
+
   switch (sortBy) {
     case "Most comments":
       filtered = "DESC"
@@ -172,6 +173,7 @@ app.post("/user", (req, res) => {
   });
 });
 
+
 // GET ALL posts
 app.get("/posts", (req, res) => {
   conn.query(
@@ -184,6 +186,7 @@ app.get("/posts", (req, res) => {
   );
 });
 
+// GET POST BY POSTID
 app.get("/post/:id", (req, res) => {
   const { id } = req.params;
   conn.query(
@@ -203,6 +206,14 @@ app.get("/post/:id", (req, res) => {
     }
   );
 });
+
+app.delete("/post/:id", (req, res) => {
+  const id = req.params.id;
+  conn.query("DELETE FROM posts WHERE postID = ?", id, (err, rows) => {
+    if (err) throw err;
+    res.status(200).send({ message: "success" });
+  })
+})
 
 // POST a new post
 app.post("/post", (req, res) => {
