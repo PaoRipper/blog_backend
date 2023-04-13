@@ -124,6 +124,16 @@ app.get("/users", (req, res) => {
   });
 });
 
+app.get("/users/:userId/posts", (req, res) => {
+  const { userId } = req.params;
+  conn.query("SELECT p.*, c.comments_count \
+  FROM posts p LEFT JOIN (SELECT postID, count(*) AS comments_count FROM comments GROUP BY postID) c \
+  ON p.postID = c.postID WHERE p.userID = ?", userId, (err, rows) => {
+    if (err) throw err;
+    res.json(rows);
+  })
+});
+
 // POST a new user
 app.post("/user", (req, res) => {
   const { username, password, email } = req.body;
