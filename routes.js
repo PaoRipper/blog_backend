@@ -37,6 +37,18 @@ const getPostByUserId = (req, res) => {
         res.json(rows);
     })
 }
+const getPostsUserFollow = (req, res) => {
+    const userId = req.params.userId
+    const query = "SELECT p.*, c.comments_count \
+    FROM posts p LEFT JOIN (SELECT postID, count(*) AS comments_count FROM comments GROUP BY postID) c \
+    ON p.postID = c.postID JOIN users_follow_posts ufp ON p.postID = ufp.postId \
+    WHERE ufp.userId = ? ORDER BY c.comments_count DESC"
+
+    conn.query(query, [userId], (err, rows) => {
+        if (err) throw err;
+        return res.json(rows)
+    })
+}
 const usersFollowPosts = (req, res) => {
     const userId = req.params.userId;
     const postId = req.params.postId;
@@ -87,6 +99,7 @@ const addNewUser = (req, res) => {
         );
     });
 }
+
 
 // POSTS
 const getAllPosts = (req, res) => {
@@ -235,6 +248,7 @@ module.exports = {
     index,
     getAllUsers,
     getPostByUserId,
+    getPostsUserFollow,
     usersFollowPosts,
     addNewUser,
     getAllPosts,
