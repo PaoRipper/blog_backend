@@ -39,6 +39,7 @@ const getPostByUserId = (req, res) => {
 }
 const getPostsUserFollow = (req, res) => {
     const userId = req.params.userId
+    const sortBy = req.query.sortBy
     let filtered = "DESC"
 
     switch (sortBy) {
