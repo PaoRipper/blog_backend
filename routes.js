@@ -62,6 +62,22 @@ const getPostsUserFollow = (req, res) => {
         return res.json(rows)
     })
 }
+const deleteUserFollowPost = (req, res) => {
+    const userId = req.params.userId;
+    const postId = req.params.postId;
+    const searchQuery = "SELECT * FROM users_follow_posts WHERE userId = ? AND postId = ?"
+    const deleteQuery = "DELETE FROM users_follow_posts WHERE userId = ? AND postId = ?"
+    conn.query(searchQuery, [userId, postId], (err, rows) => {
+        if (err) throw err;
+        if (rows.length <= 0) {
+            return res.status(404).send({ message: "User doesn't follow this post" })
+        }
+        conn.query(deleteQuery, [userId, postId], (err, rows) => {
+            if (err) throw err;
+            return res.status(200).send({ message: "success" })
+        })
+    })
+}
 const usersFollowPosts = (req, res) => {
     const userId = req.params.userId;
     const postId = req.params.postId;
@@ -263,6 +279,7 @@ module.exports = {
     getPostByUserId,
     getPostsUserFollow,
     usersFollowPosts,
+    deleteUserFollowPost,
     addNewUser,
     getAllPosts,
     getPostByPostId,
