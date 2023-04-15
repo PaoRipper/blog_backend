@@ -190,7 +190,7 @@ const getAllComments = (req, res) => {
 const getAllCommentsByPostId = (req, res) => {
     const postId = req.params.postId
     const searchPost = "SELECT * FROM posts WHERE postID = ?"
-    const query = "SELECT comments.postID, comments.commentID, comments.commentText, comments.userID, users.username \
+    const query = "SELECT comments.postID, comments.commentID, comments.commentText, comments.userID, users.username, comments.created_at \
     FROM comments JOIN users ON comments.userID = users.userID WHERE comments.postID = ?"
     conn.query(searchPost, postId, (err, rows) => {
         if (err) throw err;
