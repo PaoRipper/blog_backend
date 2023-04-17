@@ -1,6 +1,7 @@
 const conn = require("./db_config");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { sendLineNotify } = require("./utils/utils")
 
 
 // INDEX
@@ -239,7 +240,7 @@ const login = (req, res) => {
         (err, results) => {
             if (err) throw err;
             if (results.length > 0) {
-                bcrypt.compare(password, results[0].password, (error, result) => {
+                bcrypt.compare(password, results[0].password, async (error, result) => {
                     if (error) throw error;
                     if (result) {
                         const { userID, username } = results[0]
@@ -248,6 +249,7 @@ const login = (req, res) => {
                             process.env.SECRET_KEY,
                             { expiresIn: "3h" }
                         );
+                        await sendLineNotify(`${username} has logged in to bon`)
                         return res.status(200).send({ auth: true, token, userID, username });
                     }
                     return res
