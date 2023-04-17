@@ -1,15 +1,17 @@
+// External dependencies
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const conn = require("./db_config");
 const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
-const { getAllUsers, getPostByUserId, usersFollowPosts, addNewUser, getAllPosts, getPostByPostId, deletePostByPostId, addNewPost, getAllComments, addNewComment, login, register, listen, index, getPostsUserFollow, deleteUserFollowPost, getAllCommentsByPostId, getAllPostsWithFollow } = require("./routes");
-const { corsOptions } = require("./cors");
-const { serverPort, googleClientId, googleClientSecret, domain } = require("./constant");
-
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
+// Internal dependencies
+const conn = require("./db_config");
+const { getAllUsers, getPostByUserId, usersFollowPosts, addNewUser, getAllPosts, getPostByPostId, deletePostByPostId, addNewPost, getAllComments, addNewComment, login, register, listen, index, getPostsUserFollow, deleteUserFollowPost, getAllCommentsByPostId, getAllPostsWithFollow } = require("./routes");
+const { serverPort, googleClientId, googleClientSecret, domain } = require("./constant");
+const { corsOptions } = require("./cors");
 
 const app = express();
 
@@ -19,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
-
 app.use(
   session({
     secret: "bonn",
@@ -32,10 +33,10 @@ app.use(
     },
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Passport
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -85,8 +86,7 @@ passport.use(
   )
 );
 
-app.get("/", index);
-
+// Google OAuth
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -107,6 +107,7 @@ app.get("/auth/google/success", (req, res) => {
 });
 
 // Routes
+app.get("/", index);
 app.get("/users", getAllUsers);
 app.get("/users/:userId/posts", getPostByUserId);
 app.get("/users/:userId/follow/", getPostsUserFollow)
