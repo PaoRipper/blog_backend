@@ -108,21 +108,32 @@ app.get("/auth/google/success", (req, res) => {
 
 // Routes
 app.get("/", index);
+
+// Users
 app.get("/users", getAllUsers);
 app.get("/users/:userId/posts", getPostByUserId);
-app.get("/users/:userId/follow/", getPostsUserFollow)
-app.post("/users/:userId/follow/:postId", usersFollowPosts)
-app.delete("/users/:userId/follow/:postId", deleteUserFollowPost)
+app.get("/users/:userId/follow/", getPostsUserFollow);
 app.post("/user", addNewUser);
+
+// Followers
+app.post("/users/:userId/follow/:postId", usersFollowPosts);
+app.delete("/users/:userId/follow/:postId", deleteUserFollowPost);
+
+// Posts
 app.get("/posts", getAllPosts);
 app.get("/posts/follow/:userId", getAllPostsWithFollow);
 app.get("/post/:id", getPostByPostId);
-app.delete("/post/:id", deletePostByPostId)
+app.delete("/post/:id", deletePostByPostId);
 app.post("/post", addNewPost);
+
+// Comments
 app.get("/comments", getAllComments);
 app.get("/comments/:postId", getAllCommentsByPostId);
 app.post("/comment", addNewComment);
+
+// Authentication
 app.post("/login", login);
 app.post("/register", register);
 
+// Listen
 app.listen(serverPort, listen);
