@@ -114,7 +114,7 @@ app.post("/users/:userId/follow/:postId", usersFollowPosts)
 app.delete("/users/:userId/follow/:postId", deleteUserFollowPost)
 app.post("/user", addNewUser);
 app.get("/posts", getAllPosts);
-app.get("/posts/follow", getAllPostsWithFollow);
+app.get("/posts/follow/:userId", getAllPostsWithFollow);
 app.get("/post/:id", getPostByPostId);
 app.delete("/post/:id", deletePostByPostId)
 app.post("/post", addNewPost);
