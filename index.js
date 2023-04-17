@@ -5,7 +5,7 @@ const conn = require("./db_config");
 const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
-const { getAllUsers, getPostByUserId, usersFollowPosts, addNewUser, getAllPosts, getPostByPostId, deletePostByPostId, addNewPost, getAllComments, addNewComment, login, register, listen, index, getPostsUserFollow, deleteUserFollowPost, getAllCommentsByPostId } = require("./routes");
+const { getAllUsers, getPostByUserId, usersFollowPosts, addNewUser, getAllPosts, getPostByPostId, deletePostByPostId, addNewPost, getAllComments, addNewComment, login, register, listen, index, getPostsUserFollow, deleteUserFollowPost, getAllCommentsByPostId, getAllPostsWithFollow } = require("./routes");
 const { corsOptions } = require("./cors");
 const { serverPort, googleClientId, googleClientSecret, domain } = require("./constant");
 
@@ -114,6 +114,7 @@ app.post("/users/:userId/follow/:postId", usersFollowPosts)
 app.delete("/users/:userId/follow/:postId", deleteUserFollowPost)
 app.post("/user", addNewUser);
 app.get("/posts", getAllPosts);
+app.get("/posts/follow", getAllPostsWithFollow);
 app.get("/post/:id", getPostByPostId);
 app.delete("/post/:id", deletePostByPostId)
 app.post("/post", addNewPost);

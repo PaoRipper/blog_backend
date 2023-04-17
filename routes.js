@@ -141,6 +141,18 @@ const getAllPosts = (req, res) => {
         }
     );
 }
+const getAllPostsWithFollow = (req, res) => {
+    conn.query(
+        "SELECT p.postID, p.postText, p.created_at, u.username, c.commentText, IF(ufp.userId IS NULL, 0, 1) AS follow \
+        FROM posts p LEFT JOIN comments c ON p.postID = c.postID LEFT JOIN users u ON u.userID = p.userID \
+        LEFT JOIN users_follow_posts ufp ON p.postID = ufp.postId AND ufp.userId = 8",
+        (err, results) => {
+            if (err) throw err;
+            console.log(results.length);
+            res.json(results);
+        }
+    );
+}
 const getPostByPostId = (req, res) => {
     const { id } = req.params;
     conn.query(
@@ -299,6 +311,7 @@ module.exports = {
     deleteUserFollowPost,
     addNewUser,
     getAllPosts,
+    getAllPostsWithFollow,
     getPostByPostId,
     deletePostByPostId,
     addNewPost,
