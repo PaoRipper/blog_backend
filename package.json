@@ -3,15 +3,32 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "Paori",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.3.5",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.0",
+    "line-notify-sdk": "^2.0.1",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.22"
+    "mysql2": "^3.2.0",
+    "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0"
   }
 }
